@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C1 - Reconna&#238;tre les fonctions chimiques</title>
+</head>
+<body>
+<div id="fc">
+<style>
+#fc{max-width:640px;margin:auto;padding:16px;font-family:Arial,Helvetica,sans-serif;color:#4a3a22;text-align:center}
+#fc img.logo{width:220px;max-width:70%;height:auto}
+#fc h2{font-size:26px;margin:8px 0 12px}
+#fc select{padding:9px 12px;border:1px solid #d8cfbf;border-radius:8px;font-size:15px;color:#4a3a22;background:#fff}
+#fc .compteur{color:#c2a05a;font-weight:bold;margin:12px 0}
+#fc .carte{position:relative;height:320px;cursor:pointer;user-select:none;-webkit-perspective:1200px;perspective:1200px}
+#fc .interieur{position:absolute;inset:0;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;-webkit-transition:-webkit-transform .6s ease;transition:transform .6s ease}
+#fc .carte.retournee .interieur{-webkit-transform:rotateY(180deg);transform:rotateY(180deg)}
+#fc .carte.sans-anim .interieur{-webkit-transition:none;transition:none}
+#fc .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(74,58,34,.15);padding:20px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:auto}
+#fc .face.dos{background:#fbf8f2;-webkit-transform:rotateY(180deg);transform:rotateY(180deg)}
+@media (prefers-reduced-motion:reduce){#fc .interieur{-webkit-transition:none;transition:none}}
+#fc .type{font-size:14px;color:#a08348;margin-bottom:10px}
+#fc .formule{max-width:100%;overflow-x:auto}
+#fc .formule svg{display:block;margin:auto}
+#fc .nom{font-size:30px;font-weight:bold;margin-bottom:8px}
+#fc .petit{font-size:17px;color:#7a6a52;line-height:1.5}
+#fc .aide{margin-top:14px;font-size:13px;color:#888}
+#fc .boutons{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+#fc button{background:#c2a05a;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer}
+#fc button:focus-visible,#fc .carte:focus-visible,#fc select:focus-visible{outline:3px solid #4a3a22;outline-offset:2px}
+</style>
+
+<img class="logo" alt="FormaScience Strasbourg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAABdCAMAAABkbGQqAAAAflBMVEXTolnCn1nCoFm6nlz/f39+fn7/AAC+vT79/X3///++nVjZs2SrZFd+fgi+nljbpDYA/wD/fwCaazW/nlh/AAB//3+qqqoAAADFolvBnlnPq2CrqVW/fz///wDDoVrBnlkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB80kydAAAAIHRSTlMaX58XAgIBBAIBWf8EApcEAQIF+gICAwD8+f4EBAHQzx7LQvQAABxWSURBVHja7V0Je9s4kgUBkJRkKUn37C5IggD//79c1IGTlC056flmbDHdiS0egPCAQtWrg8K8jm93iMcus+to24/G1b7G7yuDTjDf+fl1fEXQnelkF67U6RNtriJ8Fs68ji8K+l/Gv71NvjN9mAA6AH0znZ/e3rbww+v4sis9LOvpbZJmhevX1cgl/NYpM7xG8Evv6UpOSxc2cxFukcvUidfgfXHQHSzxbppE+H/qwl8BfrG+dvSvvtL7q/mxTHjMizT2/Bq8b2CyWSsC3jP8Nwl7eo3dtwAd5Dsfnbm+xu4bgH52sNBJvE9e6NeG/g1AF0Fnn6e4qXfmj2nve7PP9XYNh3UfXj68c8HwbmvDszdy1+D4QOn9+JI/fDzb4sPQ9SYtdPzX/lNsnCsp/Y/pfWfvTI5/omfioIvVodMZu+60HifCEfVfK3YHn+rh594c3r3/pqeiRX14T33YZ0BfTZcWOi319elRO/iioReV5ddDh4S4dOEQglSJ+8+wKw2OKEyJMAn43PH3iGf3uP3Np8ZjyLE3KlygDrpl0mcWLqFhFcOflH931yx2Wz3R4sOgu95PBejTNvTPfYuTEX47Orwwp2LYRCf9NC0LmIdeQv90KW626iF+87IDnihh4CRf4L00/U5cSe+PzwY1NT7ZywOqUXPPwHoJbd5MPxxADpeAgRN6juxVMTWuRshwkAoM3ozd0cHlVzojTL1s0932Tovz3Rab4/w46Cjdy2MWT8r3U/uEeCzpmwQUhJyWvIeEn31XfJHeqIP7p0nmeePmJZ1Rzcjp4vZla6aEyDcu3W4hW2Qkl9QkdMs1V6ydn5aiW75Txg6FqHybprcLSsjebG8wsYtjeuuMgsskXObF1TWCFj7uzFi2eN21+HfbIjy5bGTSj4Ouw6DUY93OxU+DPsUhhi8Rej6nhuYZfg6I2hL0uh94zRKewb1xPm9Bl2YLWgtddKpXOtijWWORu03FKL/AKi+6pUrU3WAuHs/lGTst5dRY0eLlbTGAHp+UjiWCDkOwyLrv6e6xaLELfYotzqnFoW6xbmbyvwl6/2dBh8VUQj6lL5MQPQCdrwmDRF/Fbflzr6oe/DJ2mwpga9DlUjxQmfNeRMwJTZxoUuRFdTY3yR/zqlumOGP7DMFcgt5+0QJ0Gl/bgI7zYkzz3zYtTtziWrfYHM+AHlSYrd7ThTN/FPRrWExHiE6IqH0P9IlG89qAPk+1trk2q7kA/Qxzer53o7uJDWef7JRS4HGERR96FWXdbYjzFXZWEVS5DrYpvEiw//kIdLw0HSg6GHSgQkqrpAX9Zu60CJOR1zrdM3W14vys9l4My/OG+geg1ybhPE0lBlHYFaCztMrX8NKoQJfVFqSNvAd6vSjaG5GiQInDRxeFHWkSgx0lDo7v8uoUcWqwQDgAfT4cZ1rpjYBvQB80Yg7iPMOgYourHqp7Pk/OnGizobFe5JM7eg16tZch6E6LZB3A+KL2nkEN27OtQJ+zFK2BKsV7rXhUumgDejkfWAfMZ52xeO5ihO2d64NNhwphEkACXFEky41Ydd/3aBHiN5rjVUegq1Nx0MKOK32uBXwDujA0y6T9qMVwjxZFK/pd0MOXs6taVwvHOqpRmI73D9CbxJjOhatsGI1HQQ/jLVRxoIl5zToW7FIejIstaylhBMBELFb61uEhfYNwBXq1WtZy265B39kmFQ1hzQVu+GFUufRpagykBC4kscya7bizgP1qTtvXIeh7Cyj1EgT8yR2DLswltlhY5uefBy0eMSpHoIdVNx5TTqKDh4IpcsiNqfcY+RL095w5IEapV4o2T/rwByCaQM/PGGUNVL3Sg2GZydVSFa1BXxm23NxWTOKoObs0eLoXrO/BNHOWxfHP+tuP3NvtZ9C0nwRdAlw/MlwV6A7cIGidqPr+n9hi6D1KjYdBd3bksQjKAaykxBx0HVJ4J3VCEqi71OcUP6kf77CiJeha6OKAu+yWxjvYQsatI867LsMAs7cEHaTQuo5DEsy0rCvQy2+837YLAW63VtEQ2Y84kjpTaTEuKE+KiDfe8X25zHmTNZdgXIN1LZ4FXaDgy52oQOcWpfl7v1t3TYsfgu4sLnDQBFlsLsvb21uw7qfwb+iCgsUu8NlT+vyNOYstoM8U5RHu1Uq3u75mMPrEqtq18ObCll2tdHrGz75bMoxDA3r4LMZu3oyc7qx0W3Rt3m8MCHqAqz8kdh0zPmLPzA5npsRILX8KdFFr8CXoZ+6u2Pu3h15xi389BjpKL8CbjD7WqTZJ+6ZErhMJiGD+BjsEZC/YC8gCZlNREhu4D6V6D3RbACLKPpWuvbBlH4CeWDbYAVrQCyyuNZlXgZ405nB5VCc30ShRk6xWSA8Hnb0shVX5nvnzDOjw1EKDL0EnN8iDLb4PuuBNNGvNQWwrjaYHQC7C/xcmAC74Wzyjwz4gK1a0YsMPQCfRDNJZ02KJVnLbRaeT5gZnDkC3rsswXlvQ50TalNOnAT2s1bS1ZGUvS/PY8/DJATnBE7ZzhzqxDdvXyX0CdNfjtqX4a5ag99SicPaBFt8DPegtqvOR3kLc8JEQ+gzcnpJvkpRYUrVM+B18FBgKTa4emjHEEYGudz4/qsihekynZuHcoTKLnFsFOsptp1iRPdzTadgczavp3krPFGxQ1lRW/LMT57pN0U5vvZ44Y8KfD13NR6Db8+kcD9es9AE7HAV8AbojRmNTD1AreI/7mdo4l6BbY7qMGEloh5ATgRy28M0UkTOhU/5t6uguFP0De3zSUzpTm/KFnc7mFh6AXVKecbXW88GlXd278IwC9P9lbamm0RLocyU6sho3H4Celrcw/cYNFB4lgf2bWYSFfVBX/DRpHCfzNOjTeJecEdRo0uAL0GEgoS8fppZ9QM4Q7U1DK4VGrzBxSmj/4w915IxEFSso2nxRuFxZ9DfLxKKpqlsZ9HnKTh9cncVybmVRkvwoDG0Jugqb6kl02VDHxcagByVoi8ZXT05VgnvbrXReq/SZSPOv7IpFdRmnEeGedZYbWhitf+TRPV1lxkK4GnR7c3JKGnwBuqAHPdhiuCc3wm53EZWcBZenRBN8hQAEJUm8MOkoG/koaBRhsXuGfcD7MBsGFtriK0dcsdLnhj0Z03w6AF1tSfKHc5l7J+/3nJYuy+O00n3HSMJcsSwQgjjIs6ZvwkOIWxZHNt2JtlHa+nzpuCZ6mpwlT6/0kgT0tA8l0DWLNa+urgJ9ZWPiwWnWUt4rgU60N9OIAfHhpI0l9q0DR/xCE65yQ8H4xPV8xbmOjm89WBF5Z4yp6t/n3gl0m0nQ1pM9mHXLRMt64FqdEn91cxXoYs6bs43Tyherut9RsGGoz8bn31LvB2fQdU0B4KSzGFf4JLrPrPT6aEFHqYMUjahAV6S8/x7og7bb9C+CXAe1QcMG7xcW2h3IAFSW68gZ6Qwii5s3bQ4Ae5gvTlAwxPSvRWr9NOi3p0CfC3+Lrrxsc5qlYLXxJhHmaAt6YfPBxjwmcq4eVm0G0lhIWQhfu0f3658CfZl3oA/2tEVP0h8CfYmgCxJvuFBDQ310EBGaQZEDRELD9XBvtLXIMDukiNQZzZvBnCx9UvasEu/z4+I97+k27+m7yeOjApFBd4JuRNEbA/yUbcV7Jd3XMjhnq/wJHJu0kQMb/enMuXxevOfYL+/pcSXokYvalB0+Ld6DCPRFK+i4EpFREkatek2yOS5z+HeD7196Ppl3Bu5S4tbfRb8e3gV+n3EljG2K43hMkWvVkz7vsaUix3xBogay0liI9zPvm9tq04+lJtizX3RL1p1V1irtoyOvIdmYr2SVBZymOsndTyly72rvmmxZ1uB/Q5G7HGjvONMXmVwqpdBGBQ5Oh4l8llU0LCm6/1q6G1618kaQ1NtwyGqpH5tsIppsPM5tyvvqugiBZ1E817ogzDmVzcMC9CSou2LRi0a8Zwo2jUHS33fj6ih0V3TkuAa97xRNNv0J7d264jgA3QjnScCrDDr0eJ6Xh022i/vZNAIPx1YwvgIZV4AcTTCPaxgWelhkK2t7+CdcAbMFVCUvovGW1DeO5ehqxvVdckbkrdlVhvqtEgK1azWBHmRWEsQZ9PTURdL2gQZAC3rhypRxJqbJeZSA3wNrxS7MsA0zVfJxnOizNKxOLABo8AXoZyZn7KPkzAEjZ00VmYaGm4jRIRfDcgA0WeXZtbLAFnomlXjp+NLOcCxr4kDmuYwrPaRhieYYjNjyJi/a6TBH7qVm5AreQOkD0MWQGH2VHr4DPTtc5712eCc8yAnuB+yQ+l1SdATr2H4a9KzBFzQsuI7C2D7W4h0a1pmC4GDXyomAVEZg0EiQYkDTKvCu4EpWQS47WkqbYNsW8RVyqkJy87d6z+FSxjeoYqB1YU7BWipBF1YcxW4VoLukvW4JxBZ0cWDWzFNLxbqCJy2iKMJ2Of5jDhfNGkcU8Jc/7XC5cgQKR8wLsMFAqLDau0HEkJFvPsbYddPbD4hxCuYUjThsBWCyn2KyAj2rjA1/D3RdmnMK+G3g1k4qr+YkbaaCPJNREwiz/mhPbyN4N+Va0Oso2B34whyn4a/nC+2rqnCtng7crh2lKAyfBZ2GDRSavNKjH0EMOz1icJZbPH8EOnvRw4Eqo8AgbxDhAkM04DbSihZwmsuNeJugpJPOIxxFBuEdtsqzsY+5VlGxSNtCVwYXzqUdXoPeJ9FfzPoSdFUjivOmBv3cGiW7qOQROkcDWYhTchEh6MzRAi/8q5W0pnujLIb106BjMBZAR39jEEVu0Ry2uBQtvuNlsyJlgrmR2WRlrmzCA1F19VMZrYoMGO24sNQxGQBdWmvO7hP2UX+60U4V3hwMxtBKyLy90l5fu1ZtkV7XHZhsqHzOFXW8NqDXGXr7pY5KOSedyCK7JKz0JeYenCl4CVaBa8aWZtSmBvd50J0lWkymSWj63OLQ3EwtevFguNRZa32mycKY68GhfAzffMUtpbCPw98X0KYlS82IOrUQn/Uw6GSRFu4xv23TtJQkK+hqNeiDFltxfg+6c3orgp6DOdg3oPdZZ6hzjOYiKjYyWyLzi+x5IEM+B0a6YnidYhKTNY7Pgh41eDYSR1O3KGr9MgZGiqcCIwvMaR3AhBrD1HpblpzLBSLEq37MHGRE/WLGBwIj7VEswlKFvdckq6pDoOkZWQvLX60CfSwWMo5YA3qZG1dl+W0lbUlX4R6CWbLOCgoA2DitIMbFg926Wn0+91qsD4VA9zZFCvbaHYOOsa9zsd1EVQRavOYWxb0Q6P5aNNIfgE6Ygw6nU7wgMhAH+Y82GtgbOOdPPM3uof4B6O5mG5VqLuNj6Y42cuZUUNiq/2sHel959sKqbUDP0n2puYPk39/AxXXiCZmVjW6iNcSpVL3wnHowFpHDtDg9R4cfgX77gJFLVKBP5NKYW5yxxbyMFXHhSwydfjTZgd0HAfMraStsGvR3UlnZ5SgoyTYar+snQI+JOkeJaumRLeg2U7vRwK9ApwyNwv5qQHd5f+jWMR3XVVQxdjpWXgnKxppYy7CtxXTlM5o7TEyh37qTM6U1eZU5/oO0pjKrSdwDPRKRRVqTQ8GaWhQ2J1L5uGnEtCZVtbID3bLjhIQp0w44n08U8kvSyIoVfunTN5EcXC8SZfE86CBt5dQmMOJsVnEa7WLkbBU4aXeglwEz3Q50WwgCW5JvOtE6RMXyqMO4b56VjSpcoDfXlE5I0RYcQCRTuvSHCYxTmcBY5wQTF1CCDl06bBH2mDqBsR7RrU1gjOYySWj2OWK+QOjNeQ26FJK34W+NlQNF8odQH0eOojvMYsYoH8pjukMruEgTMS5I+iIlLHKq8jyVz9CDSGltRNs7z8qmJ2JUzDwmG4cO5Af0a8zUaoOPaI3QU3HdcKrynL2Ei6+y33tyR88xwJOv6UwSkgx6zE/3dW5Xk6rcDGHQIrZprrJW9y0im+ovTYvzXDV0ADooApiqUbBOYKmsXkaTcBiGZERvPaYjZdfEShrNJvR7uWxvd7kka25Nmj0qRydT5qdXz7BoTtFHFCPHtQWWmT2ffJ78eXmTf9vQZ5d956KJdqzPWNgxl1y2AMJLKjJmsBhZ2hYl0K4qEcCdBNDf2n2sLErQrpsr9bsqSjCcDls8NS22PugGdLbKvcWkx5sTiRZFuhUCZAV8Ua3YNYPhe2QKUxCr68XdgjSp/AhU/rgXRRgLakxpuzKl9dsbu6F3OD3j5hRXFAkfgT0cy494KhoArXouckIeapkesKaCKF42waypTon3rEOm8iMzDYXZ6TnR4Y7jAdSmq8gpCz2Jj8t1UIpSKp35PyqD4jffCktIOcBLmvIjTtRkat1it29E1qAjRTnNUWuK2TqD4+RCmFI4DJun38jj2m8FzLz5bJ+vN4Z5vWPSOYx4ovTB05VLnymrgDa4zhWa9v63IZYiUnSJEX+w7JW74/lBLhU0LP14i6LW3OcUef4Xaqy00ZD5V8dQ4J9tSKaw6GFHPTvcdKfP1J5Km0wu/LQ+8CU+Luv2wGXukUF2IlfvuvO0XNbL/umXnfR/rkVRp2rkOh6Qc00u47UKeEe5O1fEJltMisNGMbru9973MTggEv4Ta1Jix4b3+97/m7v+dIuiVF58jlIjzgmt3zGHGbTMCbliInMxpmS/afu3vfJBjOOrYOmzY1ZHo0XyS3Ci86RcsIo2YnqaEljkS3DWcawhWlaWCIFJ3QkkcVgAtH8N/H8K6DaC3sfIEAp8EcjpdE22OsVXqegrQfN87Rn0O9FDyT0w5Dyx36yjGvqkzGsSfRL0GAzQjYojmoNw149szVexkZoHwZQjskBe3dFFcPJchHm6ZM29PTYIoO71wrDPgh4Mno14wlgYCcLMyIuk+/5k1/qw4UMtio2B496RvJdHi6/nVCnKi0Bl31jvpfqN2sJAwF1eoH8adDbZPMV1E3OPtYiUGQ/X5XAajaLirUxSQjLcdOzDhRd9Cb8UhSUsMWzL9Lugv1b650EnipITOOYY8qYDVJgCEZa2G7JJZSkxgqijWOxxjjW+DspJOic8VTrAWYVC2VrYUoQdLcyqs4UXwzirctDIOq74spg+VzQZ4MPE80bQtVh3rwEdqGp8NrC0taVKaamPFhu3YxqKU2xgoFNfGfRU1muOZU0pyaKDmOg1wZ0VrytEPAt2yHG9sblN6C8ECVh+XBbCx1JtCoPqGzKz0fqsO+jwWRegi353dxHF8sBbpezdBr466JFtR+beMoeF3lYsVNBxNSUqrdR1FCDJsvU8lOy/OOAK3LBh7oSwFsugvXXwKiDYDdA4ABYYq9grSHvROI8UJ8GYnq8gmpM/1Al0tDDowzQlIbaNPlSJzQK+MqmtWDIzyC6I4hzxATSp87NOqXD7FwY9lgGp8q8tR8dRBUcssb5tXKxx4nKP6UkC4+KDZnU9oDUthpmR9+IXRpcm1gf8oiAJqNbBG7B7Nmt9UtGpFVze4HzljFqdV7pM+iFPDY1lsflDdoJqn+sOKRRgEFwZJrrHPOQtPN6ZlAQgIakk9Ourgw6KFU/uRHqXKUdHRxG2Sf4GqAB5oLpTrU2hx/zRWLhFEXQIVFsIdNINYylQABVA10qmPYTeGAWgF07PRVpc68XtU3J9A+jqEPSOCsAPbkgVORZ4ySTMhy8POqHlytePpOIcU4xsmOeifGfNwrAj4ng3tB6QM1Rc0GJCQ5Df4RFUe4ajB9BxGaOHPTJCAQ8CnYLvZSco3cwONwRdotWA+uEcULe/ottcdqw1TpgneRd0yM3zUO3NrqjV0MMWiDr+DqAHNbmt9HmjaF/OEWdvW6rSvDPIg15/zI9RhX1Mk7PZeZYVuVgfU1E3YAvpdFb7MJhD0Lyh+zC8iKKjOMRDSU64uVmf4xg7jFu9ubugI8HgWGnlLhoqp/49QD8Cq5uKV2TkOGiITnnCh8rRhZvE/YM08n5F0Nefq42TAsx/R1GqXTgfdD2quRzTUyYh7Mkq8+MNp4HbKJlRhQshC4qDd+H2i4GKxZTZjR7iuysd672cNHGS9LDQAuZgf1PQMeNBUhZbTiunxGYo9f/wG4n+ivssBZ5oEwMdy7obwlLBfwk61BjTqQNABDrlJa9WQ8FC2FlwpVueeVCdBMP0+wDvj6hN4sO80++s9C5VcCJfMj1MfF/QMaXgzqnnyDAd6xNOMWazAT2WY6MYnm5gIXLDIKywp5OzvhuKfgPomRWw9AysACn6aH/g7cL8ur+nU9wI31097LuCDt8+yL/RgqxF2j0sx1GEZeWfjJXQEFJEmhUEEPcHoCPQFIeb7YKe0Fg5WtfjDkEBQgB6rsk9QqlBb3jFumSS03tg7mvvV45/PnzY9wT91ivWioDXtJHvhNep6+eCJciqs51Eb45zByt9TWZiWbGRT/UU6IFxh2RqIOhp6mFVjA0NbL/mQPbbhrvCfdC54gQb/YUy831Bp/o+5dtCgLXawFPy1LuVsbS7xpiuLqaWvQO62oOOnIskYogSOY5Av7agr0TQ3ydnIujbNNUF4r8x6Bw8hVwsuMPpHYmfdmm6lQG2+hh0zGkoXqXnzEannMUadRz1C+VpduJ9ARKtm4qMUBLv4Wl6ex909xLvjd124ZCpSMDezVm735RKr3/4+4TgDHdAJ00srbmkyFFXQNX7Cbwpm2xVMSNS5ESpyN3OHebp/NJbrtDNwqMCfX0pci3qIsY9U/4kqHbPKXFqTm9H+LtHWrsnjW0POo93fH0u+GfQZENnjHMQ9gur8MSpa7ErKppsZyRxrlGPwAdrnhGU5ij0tgOdMp8F13dQ39pkixem9yPS6weflu28XMeg+rNxxHu6WAWRMwXoHaL3axXBXojkDIpkUMXsSQGrw6DDO2FMMCngQkhks04lckZAzt2FijasfPtVwGuuO8rjLkEfBhAwQZUf8WFIBH5v0OuS8J15GnNKMC2oUUy7UqnGTCXeqbgds6tdSkW2/CoyY6IkRtDjZyLRsJiCzM8F17B0XLAGysvFZ7agc14X07DiO9OwmZZ36O0kMNzTKUSUuU9OEKxFBTxMj+JZdvJSg34jztbLyuFC3DjUuEIVHjb9vcMFZqMuHC701hl3g2n3I7tTuOhiBXqsNfXdHC4fXSwovuAzsQWudHeG9QRpkvQ+tiW7VotM9Oxa9VB+HE5Zl6tVLPimNgBdFPmkUmP2Ze1aDZMU+IQh3768yUKRS5Uhh158Q9fqQ+TKZxPz+kzD+i59dvEkRmvQOek+BVGwMs8Z7Fhpn8iZXRBFohZyW/8Ta//+iiES4cLCZMvlQIc2iOIFOsK+fj4XE4vcxAio/FmqisGJqvkE0gIWQiZj4JKOT+hjlU8oj5EfW9Rkohh7pJTOWdqQrLK5NQrSinetIj/Lfo/ImX/6iC4UU9bhc++LlUawpODW6v0wPIUGe3B7k4P/0fdOQXZieIH+hw4tIE+iFgCQCWowI7SeABQC7ZpTdbRzT8XdtBjHtYnYgWDpcVcU4wQdcPjIM7PDOeoDlv0JY6z7lqt5gf41D2c8BGDSW2stvAdw+Z1E+xfo/w0H0TcXjOCzMQzHvUD/2iudAv/JnSjkNH3R3MgX6JXCwfHekI09PZy1+wL9vx11KsdB4Z9SnIcX6N8BdUOvr4CgrK/6JV+g71Gn9x2s5stmQL9A3x0xn1no10r/Tlp8/1HdsP/u4/8B9rwsddiaAXcAAAAASUVORK5CYII=">
+<h2>C1 - Reconna&#238;tre les fonctions chimiques</h2>
+
+<select id="filtre">
+  <option value="">Toutes les formules</option>
+  <option value="generique">Formules g&#233;n&#233;rales (avec R)</option>
+  <option value="developpee">Formules d&#233;velopp&#233;es</option>
+  <option value="semi">Formules semi-d&#233;velopp&#233;es</option>
+  <option value="topo">Formules topologiques</option>
+</select>
+
+<div class="compteur" id="compteur"></div>
+
+<div class="carte" id="carte" tabindex="0">
+  <div class="interieur">
+    <div class="face">
+      <div id="recto"></div>
+      <div class="aide">Quelle est cette fonction ? Cliquez pour retourner la carte</div>
+    </div>
+    <div class="face dos">
+      <div id="verso"></div>
+      <div class="aide">Cliquez pour revoir la formule</div>
+    </div>
+  </div>
+</div>
+
+<div class="boutons">
+  <button id="prec">Pr&#233;c&#233;dente</button>
+  <button id="melanger">M&#233;langer</button>
+  <button id="suiv">Suivante</button>
+</div>
+
+<script>
+/* ===== Dessin des formules =====
+   Toutes les formules sont dessinees a l'echelle 1 : les lettres des atomes
+   ont donc exactement la meme taille sur toutes les cartes.
+   Une molecule = une liste d'atomes [x, y, "texte"] ("" = sommet topologique)
+   et une liste de liaisons [atome1, atome2, ordre]. */
+
+var TAILLE = 22;            // taille des lettres des atomes (px)
+var TAILLE_INDICE = 15;     // taille des chiffres en indice / charges
+
+// "CH3" -> C H et 3 en indice ; "O^-" -> O et charge en exposant
+function texteAtome(s){
+  var html = '', largeur = 0, decalage = 0, i, c, cible, petit, sup = false;
+  for (i = 0; i < s.length; i++) {
+    c = s[i];
+    if (c === '^') { sup = true; continue; }
+    petit = sup || /[0-9]/.test(c);
+    cible = sup ? -8 : (petit ? 6 : 0);
+    html += '<tspan dy="' + (cible - decalage) + '"' + (petit ? ' font-size="' + TAILLE_INDICE + '"' : '') + '>' + c + '</tspan>';
+    decalage = cible;
+    largeur += petit ? 9 : (c === "'" ? 5 : 15);
+  }
+  return { html: html, largeur: largeur };
+}
+
+function dessiner(atomes, liaisons){
+  var infos = atomes.map(function(a){
+    var t = texteAtome(a[2]);
+    return { x: a[0], y: a[1], html: t.html, dl: a[2] ? t.largeur / 2 + 2 : 0, dh: a[2] ? 12 : 0 };
+  });
+  var svg = '', minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+
+  // Liaisons (raccourcies pour ne pas toucher les lettres)
+  liaisons.forEach(function(b){
+    var A = infos[b[0]], B = infos[b[1]];
+    var dx = B.x - A.x, dy = B.y - A.y, L = Math.sqrt(dx*dx + dy*dy), ux = dx/L, uy = dy/L;
+    function retrait(P){
+      if (!P.dl) return 0;
+      var s1 = Math.abs(ux) > 1e-6 ? P.dl / Math.abs(ux) : 1e9;
+      var s2 = Math.abs(uy) > 1e-6 ? P.dh / Math.abs(uy) : 1e9;
+      return Math.min(s1, s2) + 3;
+    }
+    var ra = retrait(A), rb = retrait(B);
+    var x1 = A.x + ux*ra, y1 = A.y + uy*ra, x2 = B.x - ux*rb, y2 = B.y - uy*rb;
+    var decal = b[2] === 2 ? [-3.5, 3.5] : [0];
+    decal.forEach(function(d){
+      svg += '<line x1="' + (x1 - uy*d) + '" y1="' + (y1 + ux*d) + '" x2="' + (x2 - uy*d) + '" y2="' + (y2 + ux*d) +
+             '" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>';
+    });
+  });
+
+  // Atomes
+  infos.forEach(function(a){
+    minX = Math.min(minX, a.x - a.dl); maxX = Math.max(maxX, a.x + a.dl);
+    minY = Math.min(minY, a.y - Math.max(a.dh, 2)); maxY = Math.max(maxY, a.y + Math.max(a.dh, 2));
+    if (a.html) svg += '<text x="' + a.x + '" y="' + (a.y + 8) + '" font-size="' + TAILLE +
+      '" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="currentColor">' + a.html + '</text>';
+  });
+
+  var m = 8, w = maxX - minX + 2*m, h = maxY - minY + 2*m;
+  return '<svg width="' + w + '" height="' + h + '" viewBox="' + (minX - m) + ' ' + (minY - m) + ' ' + w + ' ' + h + '">' + svg + '</svg>';
+}
+
+// Groupe CH3 developpe autour d'un carbone en (x, 0) : H a gauche (ou droite), en haut et en bas
+function methyle(x, cote){ return [[x + cote*45, 0, 'H'], [x, -45, 'H'], [x, 45, 'H']]; }
+
+/* ===== Les cartes ===== */
+var FONCTIONS = {
+  alcool:    { nom: 'Alcool',              groupe: 'groupe hydroxyle' },
+  aldehyde:  { nom: 'Ald\u00e9hyde',            groupe: 'groupe carbonyle, en bout de cha\u00eene' },
+  cetone:    { nom: 'C\u00e9tone',              groupe: 'groupe carbonyle, en milieu de cha\u00eene' },
+  acide:     { nom: 'Acide carboxylique',  groupe: 'groupe carboxyle' },
+  amine:     { nom: 'Amine',               groupe: 'groupe amino' },
+  phosphate: { nom: 'Phosphate organique', groupe: 'groupe phosphate' },
+  thiol:     { nom: 'Thiol',               groupe: 'groupe sulfanyle (ou thiol)' }
+};
+
+var TYPES = {
+  generique:  'Formule g\u00e9n\u00e9rale',
+  developpee: 'Formule d\u00e9velopp\u00e9e',
+  semi:       'Formule semi-d\u00e9velopp\u00e9e',
+  topo:       'Formule topologique'
+};
+
+// [fonction, type, molecule, atomes, liaisons]
+var DONNEES = [
+  // ---------- Alcool ----------
+  ['alcool', 'generique', '', [[0,0,'R'],[60,0,'OH']], [[0,1,1]]],
+  ['alcool', 'developpee', '\u00e9thanol',
+    [[0,0,'C'],[50,0,'C'],[100,0,'O'],[150,0,'H']].concat(methyle(0,-1), [[50,-45,'H'],[50,45,'H']]),
+    [[0,1,1],[1,2,1],[2,3,1],[0,4,1],[0,5,1],[0,6,1],[1,7,1],[1,8,1]]],
+  ['alcool', 'semi', '\u00e9thanol', [[0,0,'CH3'],[70,0,'CH2'],[140,0,'OH']], [[0,1,1],[1,2,1]]],
+  ['alcool', 'topo', '\u00e9thanol', [[0,20,''],[35,0,''],[75,20,'OH']], [[0,1,1],[1,2,1]]],
+
+  // ---------- Aldehyde ----------
+  ['aldehyde', 'generique', '', [[0,0,'R'],[55,0,'C'],[85,-45,'O'],[85,45,'H']], [[0,1,1],[1,2,2],[1,3,1]]],
+  ['aldehyde', 'developpee', '\u00e9thanal (ac\u00e9tald\u00e9hyde)',
+    [[0,0,'C'],[50,0,'C'],[80,-45,'O'],[80,45,'H']].concat(methyle(0,-1)),
+    [[0,1,1],[1,2,2],[1,3,1],[0,4,1],[0,5,1],[0,6,1]]],
+  ['aldehyde', 'semi', '\u00e9thanal (ac\u00e9tald\u00e9hyde)', [[0,0,'CH3'],[65,0,'C'],[95,-45,'O'],[95,45,'H']], [[0,1,1],[1,2,2],[1,3,1]]],
+  ['aldehyde', 'topo', '\u00e9thanal (ac\u00e9tald\u00e9hyde)', [[0,20,''],[35,0,''],[70,20,'O']], [[0,1,1],[1,2,2]]],
+
+  // ---------- Cetone ----------
+  ['cetone', 'generique', '', [[0,0,'R'],[55,0,'C'],[110,0,"R'"],[55,-50,'O']], [[0,1,1],[1,2,1],[1,3,2]]],
+  ['cetone', 'developpee', 'propanone (ac\u00e9tone)',
+    [[0,0,'C'],[50,0,'C'],[100,0,'C'],[50,-50,'O']].concat(methyle(0,-1), methyle(100,1)),
+    [[0,1,1],[1,2,1],[1,3,2],[0,4,1],[0,5,1],[0,6,1],[2,7,1],[2,8,1],[2,9,1]]],
+  ['cetone', 'semi', 'propanone (ac\u00e9tone)', [[0,0,'CH3'],[65,0,'C'],[130,0,'CH3'],[65,-50,'O']], [[0,1,1],[1,2,1],[1,3,2]]],
+  ['cetone', 'topo', 'propanone (ac\u00e9tone)', [[0,20,''],[35,0,''],[70,20,''],[35,-40,'O']], [[0,1,1],[1,2,1],[1,3,2]]],
+
+  // ---------- Acide carboxylique ----------
+  ['acide', 'generique', '', [[0,0,'R'],[55,0,'C'],[85,-45,'O'],[90,45,'OH']], [[0,1,1],[1,2,2],[1,3,1]]],
+  ['acide', 'developpee', 'acide \u00e9thano\u00efque (acide ac\u00e9tique)',
+    [[0,0,'C'],[50,0,'C'],[80,-45,'O'],[80,45,'O'],[125,45,'H']].concat(methyle(0,-1)),
+    [[0,1,1],[1,2,2],[1,3,1],[3,4,1],[0,5,1],[0,6,1],[0,7,1]]],
+  ['acide', 'semi', 'acide \u00e9thano\u00efque (acide ac\u00e9tique)', [[0,0,'CH3'],[65,0,'C'],[95,-45,'O'],[100,45,'OH']], [[0,1,1],[1,2,2],[1,3,1]]],
+  ['acide', 'topo', 'acide \u00e9thano\u00efque (acide ac\u00e9tique)', [[0,20,''],[35,0,''],[35,-40,'O'],[75,20,'OH']], [[0,1,1],[1,2,2],[1,3,1]]],
+
+  // ---------- Amine ----------
+  ['amine', 'generique', '', [[0,0,'R'],[55,0,'N'],[85,-45,'H'],[85,45,'H']], [[0,1,1],[1,2,1],[1,3,1]]],
+  ['amine', 'developpee', 'm\u00e9thylamine',
+    [[0,0,'C'],[50,0,'N'],[80,-45,'H'],[80,45,'H']].concat(methyle(0,-1)),
+    [[0,1,1],[1,2,1],[1,3,1],[0,4,1],[0,5,1],[0,6,1]]],
+  ['amine', 'semi', 'm\u00e9thylamine', [[0,0,'CH3'],[78,0,'NH2']], [[0,1,1]]],
+  ['amine', 'topo', 'm\u00e9thylamine', [[0,22,''],[50,0,'NH2']], [[0,1,1]]],
+
+  // ---------- Phosphate ----------
+  ['phosphate', 'generique', '', [[0,0,'R'],[50,0,'O'],[100,0,'P'],[100,-50,'O'],[100,50,'OH'],[150,0,'O^\u2212']],
+    [[0,1,1],[1,2,1],[2,3,2],[2,4,1],[2,5,1]]],
+  ['phosphate', 'developpee', 'm\u00e9thylphosphate',
+    [[0,0,'C'],[50,0,'O'],[100,0,'P'],[100,-50,'O'],[100,50,'O'],[145,50,'H'],[150,0,'O^\u2212']].concat(methyle(0,-1)),
+    [[0,1,1],[1,2,1],[2,3,2],[2,4,1],[4,5,1],[2,6,1],[0,7,1],[0,8,1],[0,9,1]]],
+  ['phosphate', 'semi', 'm\u00e9thylphosphate', [[0,0,'CH3'],[60,0,'O'],[110,0,'P'],[110,-50,'O'],[110,50,'OH'],[160,0,'O^\u2212']],
+    [[0,1,1],[1,2,1],[2,3,2],[2,4,1],[2,5,1]]],
+  ['phosphate', 'topo', 'm\u00e9thylphosphate', [[0,22,''],[42,0,'O'],[92,0,'P'],[92,-50,'O'],[92,50,'OH'],[142,0,'O^\u2212']],
+    [[0,1,1],[1,2,1],[2,3,2],[2,4,1],[2,5,1]]],
+
+  // ---------- Thiol ----------
+  ['thiol', 'generique', '', [[0,0,'R'],[60,0,'SH']], [[0,1,1]]],
+  ['thiol', 'developpee', 'm\u00e9thanethiol', [[0,0,'C'],[50,0,'S'],[100,0,'H']].concat(methyle(0,-1)),
+    [[0,1,1],[1,2,1],[0,3,1],[0,4,1],[0,5,1]]],
+  ['thiol', 'semi', 'm\u00e9thanethiol', [[0,0,'CH3'],[70,0,'SH']], [[0,1,1]]],
+  ['thiol', 'topo', 'm\u00e9thanethiol', [[0,22,''],[48,0,'SH']], [[0,1,1]]]
+];
+
+var toutes = DONNEES.map(function(d){
+  var f = FONCTIONS[d[0]];
+  return {
+    type: d[1],
+    recto: '<div class="type">' + TYPES[d[1]] + '</div><div class="formule">' + dessiner(d[3], d[4]) + '</div>',
+    verso: '<div class="nom">' + f.nom + '</div><div class="petit">' + f.groupe + (d[2] ? '<br>Mol\u00e9cule : ' + d[2] : '') + '</div>'
+  };
+});
+
+/* ===== Fonctionnement des cartes ===== */
+var cartes = toutes.slice();
+var i = 0;
+var carte = document.getElementById('carte');
+
+// Affiche la carte numero i, cote formule, sans animation
+function afficher(){
+  carte.classList.add('sans-anim');
+  carte.classList.remove('retournee');
+  document.getElementById('recto').innerHTML = cartes[i].recto;
+  document.getElementById('verso').innerHTML = cartes[i].verso;
+  document.getElementById('compteur').innerHTML = 'Carte ' + (i + 1) + ' / ' + cartes.length;
+  void carte.offsetWidth;
+  carte.classList.remove('sans-anim');
+}
+function aller(pas){ i = (i + pas + cartes.length) % cartes.length; afficher(); }
+function retourner(){ carte.classList.toggle('retournee'); }
+
+document.getElementById('carte').onclick = retourner;
+document.getElementById('carte').onkeydown = function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); retourner(); } };
+document.getElementById('prec').onclick = function(){ aller(-1); };
+document.getElementById('suiv').onclick = function(){ aller(1); };
+document.getElementById('melanger').onclick = function(){
+  for (var k = cartes.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)); var t = cartes[k]; cartes[k] = cartes[j]; cartes[j] = t; }
+  i = 0; afficher();
+};
+document.getElementById('filtre').onchange = function(){
+  var v = this.value;
+  cartes = toutes.filter(function(c){ return !v || c.type === v; });
+  i = 0; afficher();
+};
+
+afficher();
+</script>
+</div>
+</body>
+</html>
